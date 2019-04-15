@@ -89,13 +89,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         call.enqueue(new Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
+                Message message = new Message();
+                message.what = 5;
+                handler.sendMessage(message);
                 e.printStackTrace();
             }
 
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 byte[] byte_image = response.body().bytes();
-//                byte[] Picture = (byte[]) msg.obj;
+////                byte[] Picture = (byte[]) msg.obj;
 
                 //把字节数组转化为bitmap
 
@@ -111,8 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 message.what = 1;
                 handler.sendMessage(message);
 
-                Log.d("byte_image", String.valueOf(byte_image));
-                Log.d("cookie", cookie);
+//                Log.d("byte_image", String.valueOf(byte_image));
+//                Log.d("cookie", cookie);
                 chucun.__VIEWSTATE = getViewState(cookie);//获取__VIEWSTATE
                 s = session.substring(0, session.indexOf(";"));
 //                String[] strings = s.split("[=]");
@@ -235,6 +238,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (msg.what == 4) {
                 Toast.makeText(MainActivity.this, "服务器验证失败,请稍后重试", Toast.LENGTH_SHORT).show();
             }
+            
+            if(msg.what == 5){
+                Toast.makeText(MainActivity.this, "验证码获取失败", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -249,13 +256,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String account = zhanghu.getText().toString();
                 String password = mima.getText().toString();
                 String verificationCode = yanzhengma.getText().toString();
-                if(account==null){
+                if("".equals(account)){
                     Toast.makeText(this, "请输入账户", Toast.LENGTH_SHORT).show();
                     zhanghu.requestFocus();
-                }else if(password == null){
+                }else if("".equals(password)){
                     Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
                     mima.requestFocus();
-                }else if (verificationCode==null){
+                }else if ("".equals(verificationCode)){
                     Toast.makeText(this, "请输入验证码", Toast.LENGTH_SHORT).show();
                     yanzhengma.requestFocus();
                 }else {
