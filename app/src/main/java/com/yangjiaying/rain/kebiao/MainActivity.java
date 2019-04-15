@@ -42,17 +42,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Bitmap bitmap;//验证码的图
     private String s;
     private String name;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();//初始化控件
-        SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
-        Boolean a = read.getBoolean("gou",false);
-        if(a){
+        SharedPreferences read = getSharedPreferences("rain", MODE_PRIVATE);
+        Boolean a = read.getBoolean("gou", false);
+        if (a) {
             jizhu.setChecked(a);
-            String user = read.getString("use","");
-            String pass = read.getString("password","");
+            String user = read.getString("use", "");
+            String pass = read.getString("password", "");
             zhanghu.setText(user);
             mima.setText(pass);
         }
@@ -112,13 +113,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 Log.d("byte_image", String.valueOf(byte_image));
                 Log.d("cookie", cookie);
+                chucun.__VIEWSTATE = getViewState(cookie);//获取__VIEWSTATE
                 s = session.substring(0, session.indexOf(";"));
 //                String[] strings = s.split("[=]");
 //                s = strings[1];
                 chucun.cookie = s;
-                Log.d("cookies",s);
+                Log.d("cookies", s);
             }
         });
+    }
+
+    /*
+     * 获取__VIEWSTATE
+     * */
+    public static String getViewState(String cookie)
+            throws UnsupportedOperationException,
+            IOException {
+        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .header("Cookie", cookie)
+                .header("Referer", "http://jw.svtcc.edu.cn/")
+                .url("http://jw.svtcc.edu.cn/default2.aspx")
+                .build();
+        Response response = okHttpClient.newCall(request).execute();
+        String s = response.body().string();
+        String viewstate = Jsoup.parse(s).select("input[name=__VIEWSTATE]").val();
+        return viewstate;
     }
 
     /*
@@ -128,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         chucun.xuehao = zhanghu;
         OkHttpClient okHttpClient = new OkHttpClient();
         FormBody body = new FormBody.Builder()
-                .add("__VIEWSTATE", "dDw3OTkxMjIwNTU7Oz44uODbJt16RirQGbVViKtH50kqxA==")
+                .add("__VIEWSTATE", chucun.__VIEWSTATE)
                 .add("TextBox1", zhanghu)
                 .add("TextBox2", mima)
                 .add("TextBox3", yanzhengma)
@@ -136,19 +156,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .add("Button1", "")
                 .build();
 
-            if(jizhu.isChecked()){
-                SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
-                editor.putString("use",zhanghu);
-                editor.putString("password",mima);
-                editor.putBoolean("gou",true);
-                editor.commit();
-            }else{
-                SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
-                editor.putString("use",zhanghu);
-                editor.putString("password","");
-                editor.putBoolean("gou",false);
-                editor.commit();
-            }
+        if (jizhu.isChecked()) {
+            SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
+            editor.putString("use", zhanghu);
+            editor.putString("password", mima);
+            editor.putBoolean("gou", true);
+            editor.commit();
+        } else {
+            SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
+            editor.putString("use", zhanghu);
+            editor.putString("password", "");
+            editor.putBoolean("gou", false);
+            editor.commit();
+        }
 
 
         final Request request = new Request.Builder()
@@ -168,14 +188,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 /*你想要执行的下一步功能*/
                 int code = response.code();
-                Log.d("code", String.valueOf(code));
+//                Log.d("code", String.valueOf(code));
                 byte[] bytes = response.body().bytes();
-                String data  = new String(bytes,"gb2312");
-                if(data!=null){
+                String data = new String(bytes, "gb2312");
+                Document document = Jsoup.parse(data);
+                String title = document.title();
+//                Log.d("data", data);//登录之后得到的html
+                if ("正方教务管理系统".equals(title)) {
                     tiqu(data);
-                }else {
+                } else {
                     Message message = new Message();
-                    message.what = 3;
+                    message.what = 4;
                     handler.sendMessage(message);
                 }
             }
@@ -187,20 +210,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            /*
+             * 设置验证码图片
+             * */
             if (msg.what == 1) {
                 yanzhengmatu.setImageBitmap(bitmap);
             }
+            /*
+             * 登录成功跳转guodu界面
+             * */
             if (msg.what == 2) {
                 Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this,guodu.class);
-                    chucun.xingming = name;
+                Intent intent = new Intent(MainActivity.this, guodu.class);
+                chucun.xingming = name;
 //                intent.putExtra("name",name);
                 startActivity(intent);
                 MainActivity.this.finish();
 //                xianshi.setText(name);
             }
-            if(msg.what==3){
+            if (msg.what == 3) {
                 Toast.makeText(MainActivity.this, "出现不可预料的错误", Toast.LENGTH_SHORT).show();
+            }
+
+            if (msg.what == 4) {
+                Toast.makeText(MainActivity.this, "服务器验证失败,请稍后重试", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -216,21 +249,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String account = zhanghu.getText().toString();
                 String password = mima.getText().toString();
                 String verificationCode = yanzhengma.getText().toString();
-                LoginServer(account, password, verificationCode);
+                if(account==null){
+                    Toast.makeText(this, "请输入账户", Toast.LENGTH_SHORT).show();
+                    zhanghu.requestFocus();
+                }else if(password == null){
+                    Toast.makeText(this, "请输入密码", Toast.LENGTH_SHORT).show();
+                    mima.requestFocus();
+                }else if (verificationCode==null){
+                    Toast.makeText(this, "请输入验证码", Toast.LENGTH_SHORT).show();
+                    yanzhengma.requestFocus();
+                }else {
+                    LoginServer(account, password, verificationCode);
+                }
+
                 break;
         }
     }
+
     /**
      * 提取
      *
-     * @param data*/
-    private void tiqu(String data){
+     * @param data
+     */
+    private void tiqu(String data) {
         Document document = Jsoup.parse(data);
         String element = document.getElementById("xhxm").html();
-        name = element.toString();
-        Message message = new Message();
-        message.what = 2;
-        handler.sendMessage(message);
+        if(element==null){
+            Message message = new Message();
+            message.what = 3;
+            handler.sendMessage(message);
+        }else {
+            name = element.toString();
+            Message message = new Message();
+            message.what = 2;
+            handler.sendMessage(message);
+        }
+
+    }
+
+
+    /*
+     * 打印超长Log
+     * */
+    public static void i(String tag, String msg) {  //信息太长,分段打印
+        //因为String的length是字符数量不是字节数量所以为了防止中文字符过多，
+        //  把4*1024的MAX字节打印长度改为2001字符数
+        int max_str_length = 2001 - tag.length();
+        //大于4000时
+        while (msg.length() > max_str_length) {
+            Log.i(tag, msg.substring(0, max_str_length));
+            msg = msg.substring(max_str_length);
+        }
+        //剩余部分
+        Log.i(tag, msg);
     }
 
 }
