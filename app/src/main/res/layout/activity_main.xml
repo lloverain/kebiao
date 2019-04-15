@@ -1,34 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#e1e1e1"
+    android:gravity="center"
     tools:context=".MainActivity">
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:background="@mipmap/xiaohui"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="四川交通职业技术学院"
+        android:textSize="15sp"
+        android:textColor="#000000"
+        android:gravity="center"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_gravity="center"
         android:orientation="vertical">
         <EditText
             android:id="@+id/zhanghu"
             android:layout_width="match_parent"
             android:hint="账户"
+            android:background="@drawable/wenkenkuang"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_height="50dp" />
         <EditText
             android:id="@+id/mima"
             android:layout_width="match_parent"
             android:hint="密码"
+            android:background="@drawable/wenkenkuang"
             android:password="true"
             android:layout_height="50dp" />
-        <ImageView
-            android:id="@+id/yanzhengmatu"
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
-        <EditText
-            android:id="@+id/yanzhengma"
-            android:layout_width="match_parent"
-            android:hint="验证码"
-            android:layout_height="40dp" />
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="40dp"
+           android:layout_marginTop="10dp"
+           android:orientation="horizontal">
+           <EditText
+               android:id="@+id/yanzhengma"
+               android:layout_width="0dp"
+               android:layout_weight="1"
+               android:hint="验证码"
+               android:background="@drawable/wenkenkuang"
+               android:layout_height="match_parent" />
+           <ImageView
+               android:id="@+id/yanzhengmatu"
+               android:layout_width="0dp"
+               android:layout_weight="1"
+               android:layout_height="match_parent" />
+
+       </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="30dp"
@@ -49,6 +78,8 @@
             android:layout_width="match_parent"
             android:layout_margin="20dp"
             android:layout_height="50dp"
+            android:background="@drawable/login"
+            android:textSize="18sp"
             android:text="登录"/>
         <TextView
             android:id="@+id/xianshi"
@@ -56,4 +87,4 @@
             android:layout_height="match_parent" />
     </LinearLayout>
 
-</ScrollView>
+</LinearLayout>
