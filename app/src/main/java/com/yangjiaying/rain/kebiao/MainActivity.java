@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jsoup.Jsoup;
@@ -29,19 +28,17 @@ import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private ImageView yanzhengmatu;
-    private EditText zhanghu;
-    private EditText mima;
-    private EditText yanzhengma;
-    private Button login;
-    private TextView xianshi;
-    private CheckBox jizhu;
+    private ImageView yanzhengmatu;//显示验证码图控件
+    private EditText zhanghu;//输入账户控件
+    private EditText mima;//输入密码控件
+    private EditText yanzhengma;//输入验证码控件
+    private Button login;//登录按钮
+    private CheckBox jizhu;//记住密码多选按钮控件
 
     private Bitmap bitmap;//验证码的图
-    private String s;
-    private String name;
+    private String s;//cookie
+    private String name;//账户名
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,24 +59,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         login.setOnClickListener(this);
     }
 
-    /*
+    /**
      * 初始化控件
-     * */
+     */
     private void initView() {
         yanzhengmatu = findViewById(R.id.yanzhengmatu);
         zhanghu = findViewById(R.id.zhanghu);
         mima = findViewById(R.id.mima);
         yanzhengma = findViewById(R.id.yanzhengma);
         login = findViewById(R.id.login);
-        xianshi = findViewById(R.id.xianshi);
         jizhu = findViewById(R.id.jizhu);
     }
 
 
-    /*
+    /**
      * 得到Cookies和验证码图片
-     * */
-
+     */
     private void ChangeImage() {
         Request request = new Request.Builder()
                 .url("http://jw.svtcc.edu.cn/CheckCode.aspx")
@@ -98,37 +93,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 byte[] byte_image = response.body().bytes();
-////                byte[] Picture = (byte[]) msg.obj;
-
-                //把字节数组转化为bitmap
-
-                bitmap = BitmapFactory.decodeByteArray(byte_image, 0, byte_image.length);
-                //session
-
-                Headers headers = response.headers();
-                List<String> cookies = headers.values("Set-Cookie");
+                bitmap = BitmapFactory.decodeByteArray(byte_image, 0, byte_image.length);//获取验证码图片
+                Headers headers = response.headers();//获取网页头部
+                List<String> cookies = headers.values("Set-Cookie");//取cookie值
                 String session = cookies.get(0);
                 String cookie = cookies.toString();
-
                 Message message = new Message();
                 message.what = 1;
                 handler.sendMessage(message);
-
-//                Log.d("byte_image", String.valueOf(byte_image));
-//                Log.d("cookie", cookie);
                 chucun.__VIEWSTATE = getViewState(cookie);//获取__VIEWSTATE
                 s = session.substring(0, session.indexOf(";"));
-//                String[] strings = s.split("[=]");
-//                s = strings[1];
                 chucun.cookie = s;
-                Log.d("cookies", s);
             }
         });
     }
 
-    /*
+    /**
      * 获取__VIEWSTATE
-     * */
+     * @param cookie
+     * @return __VIEWSTATE
+     * @throws UnsupportedOperationException
+     * @throws IOException
+     */
     public static String getViewState(String cookie)
             throws UnsupportedOperationException,
             IOException {
@@ -184,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
                 e.printStackTrace();
-                return;
+                Message message = new Message();
+                message.what = 6;
+                handler.sendMessage(message);
             }
 
             @Override
@@ -208,7 +196,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-
+    /**
+     * 1    给验证码控件附图片
+     * 2    登陆成功并跳转
+     * 3    提示出现不可预料的错误
+     * 4    提示服务器验证失败,请稍后重试
+     * 5    提示验证码获取失败
+     * 6    提示服务器未响应，请稍后再试
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -242,6 +237,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(msg.what == 5){
                 Toast.makeText(MainActivity.this, "验证码获取失败", Toast.LENGTH_SHORT).show();
             }
+            if(msg.what==6){
+                Toast.makeText(MainActivity.this, "服务器未响应，请稍后再试", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -274,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 提取
+     * 提取网页上的姓名
      *
      * @param data
      */
@@ -295,9 +293,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    /*
+    /**
      * 打印超长Log
-     * */
+     * @param tag
+     * @param msg
+     */
     public static void i(String tag, String msg) {  //信息太长,分段打印
         //因为String的length是字符数量不是字节数量所以为了防止中文字符过多，
         //  把4*1024的MAX字节打印长度改为2001字符数

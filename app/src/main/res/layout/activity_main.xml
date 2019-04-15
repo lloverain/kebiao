@@ -81,10 +81,6 @@
             android:background="@drawable/login"
             android:textSize="18sp"
             android:text="登录"/>
-        <TextView
-            android:id="@+id/xianshi"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
 
+    </LinearLayout>
 </LinearLayout>
