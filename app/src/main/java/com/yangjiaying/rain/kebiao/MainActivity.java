@@ -1,11 +1,13 @@
 package com.yangjiaying.rain.kebiao;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -178,14 +180,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 /*你想要执行的下一步功能*/
-                int code = response.code();
+//                int code = response.code();
 //                Log.d("code", String.valueOf(code));
                 byte[] bytes = response.body().bytes();
                 String data = new String(bytes, "gb2312");
                 Document document = Jsoup.parse(data);
                 String title = document.title();
-//                Log.d("data", data);//登录之后得到的html
-                if ("正方教务管理系统".equals(title)) {
+                Log.d("data", data);//登录之后得到的html
+                if("登录".equals(title)){
+                    Message message = new Message();
+                    message.what = 7;
+                    handler.sendMessage(message);
+                }else if ("正方教务管理系统".equals(title)) {
                     tiqu(data);
                 } else {
                     Message message = new Message();
@@ -203,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 4    提示服务器验证失败,请稍后重试
      * 5    提示验证码获取失败
      * 6    提示服务器未响应，请稍后再试
+     * 7    验证码输入错误时，提示并重新刷新验证码
      */
     private Handler handler = new Handler() {
         @Override
@@ -218,13 +225,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
              * 登录成功跳转guodu界面
              * */
             if (msg.what == 2) {
-                Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(MainActivity.this, guodu.class);
                 chucun.xingming = name;
-//                intent.putExtra("name",name);
                 startActivity(intent);
                 MainActivity.this.finish();
-//                xianshi.setText(name);
             }
             if (msg.what == 3) {
                 Toast.makeText(MainActivity.this, "出现不可预料的错误", Toast.LENGTH_SHORT).show();
@@ -239,6 +243,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             if(msg.what==6){
                 Toast.makeText(MainActivity.this, "服务器未响应，请稍后再试", Toast.LENGTH_SHORT).show();
+            }
+            if(msg.what == 7){
+                showdialog();
             }
         }
     };
@@ -292,6 +299,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * 显示验证码错误提示框
+     */
+    private void showdialog(){
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(MainActivity.this);
+        normalDialog.setIcon(R.mipmap.xiaohui);
+        normalDialog.setTitle("Error");
+        normalDialog.setMessage("输入的验证码错误！");
+        normalDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //...To-do
+                        ChangeImage();
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
 
     /**
      * 打印超长Log
