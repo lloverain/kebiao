@@ -7,6 +7,14 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="windowNoTitle">true</item>
+        <!--设置支持过渡动画-->
+        <item name="android:windowContentTransitions">true</item>
+        <!--设置进入动画      通过分解方式进入-->
+        <item name="android:windowEnterTransition">@transition/fade</item>
+        <!--设置退出动画      通过分解方式退出-->
+        <item name="android:windowExitTransition">@transition/fade</item>
+        <item name="android:windowReenterTransition">@transition/fade</item>
+        <item name="android:windowReturnTransition">@transition/fade</item>
     </style>
 
 </resources>

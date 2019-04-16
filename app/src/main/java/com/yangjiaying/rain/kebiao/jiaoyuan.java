@@ -188,17 +188,9 @@ public class jiaoyuan extends AppCompatActivity {
                             a = a.replace("&nbsp;","");
                             a = a.replace("<br>","\n");
                             data[c][x] = a;
-//                            Log.d(String.valueOf(j),a);
                         }
                     }
 
-                }
-                Log.d("data", String.valueOf(data.length));
-                Log.d("data[1]", String.valueOf(data[1].length));
-                for(int a = 0;a<data.length;a++){
-                    for(int x=0;x<data[a].length;x++){
-                        Log.d("data"+"["+a+"]"+"["+x+"]",data[a][x]);
-                    }
                 }
                 Message message = new Message();
                 message.what = 1;

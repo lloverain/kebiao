@@ -1,5 +1,6 @@
 package com.yangjiaying.rain.kebiao;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +25,7 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.util.List;
 
+import me.james.biuedittext.BiuEditText;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -32,9 +34,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private ImageView yanzhengmatu;//显示验证码图控件
-    private EditText zhanghu;//输入账户控件
-    private EditText mima;//输入密码控件
-    private EditText yanzhengma;//输入验证码控件
+    private BiuEditText zhanghu;//输入账户控件
+    private BiuEditText mima;//输入密码控件
+    private BiuEditText yanzhengma;//输入验证码控件
     private Button login;//登录按钮
     private CheckBox jizhu;//记住密码多选按钮控件
 
@@ -225,7 +227,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (msg.what == 2) {
                 Intent intent = new Intent(MainActivity.this, guodu.class);
                 chucun.xingming = name;
-                startActivity(intent);
+//                startActivity(intent);
+                startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle());
                 MainActivity.this.finish();
             }
             if (msg.what == 3) {
