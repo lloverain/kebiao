@@ -1,8 +1,11 @@
 package com.yangjiaying.rain.kebiao;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
@@ -11,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -179,6 +183,8 @@ public class jiaoyuan extends AppCompatActivity {
                     }else {
                         for(int j=1,x =0;j<tds.size();j++,x++){
                             String a = tds.get(j).html();
+                            a = a.replace("<font color=\"red\">","");
+                            a = a.replace("</font>","");
                             a = a.replace("&nbsp;","");
                             a = a.replace("<br>","\n");
                             data[c][x] = a;
@@ -229,7 +235,7 @@ public class jiaoyuan extends AppCompatActivity {
         return true;
     }
 
-    public void setCourseMessage(int xingqi,int jieci,String courseMessage){
+    public void setCourseMessage(int xingqi, int jieci, final String courseMessage){
         //五种颜色的背景
         int[] background = {R.drawable.red, R.drawable.green,
                 R.drawable.purple, R.drawable.yellow,
@@ -257,6 +263,26 @@ public class jiaoyuan extends AppCompatActivity {
         //设置不透明度
         courseInfo.getBackground().setAlpha(222);
         course_table_layout.addView(courseInfo);
+        courseInfo.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                final AlertDialog.Builder normalDialog =
+                        new AlertDialog.Builder(jiaoyuan.this);
+                normalDialog.setIcon(R.mipmap.xiaohui);
+                normalDialog.setTitle("课程");
+                normalDialog.setMessage(courseMessage);
+                normalDialog.setPositiveButton("确定",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //...To-do
+                            }
+                        });
+                // 显示
+                normalDialog.show();
+                return false;
+            }
+        });
     }
 
 
