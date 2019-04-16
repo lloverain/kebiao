@@ -180,13 +180,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(okhttp3.Call call, Response response) throws IOException {
                 /*你想要执行的下一步功能*/
-//                int code = response.code();
-//                Log.d("code", String.valueOf(code));
                 byte[] bytes = response.body().bytes();
                 String data = new String(bytes, "gb2312");
                 Document document = Jsoup.parse(data);
                 String title = document.title();
-                Log.d("data", data);//登录之后得到的html
+//                Log.d("data", data);//登录之后得到的html
                 if("登录".equals(title)){
                     Message message = new Message();
                     message.what = 7;

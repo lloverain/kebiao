@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".guodu" />
-        <activity android:name=".jiaoyuan"></activity>
+        <activity android:name=".jiaoyuan" />
     </application>
 
 </manifest>
