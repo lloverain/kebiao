@@ -6,7 +6,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@layout/activity_jiaoyuan"
         android:label="@string/app_name"
         android:roundIcon="@layout/activity_jiaoyuan"
         android:supportsRtl="true"
