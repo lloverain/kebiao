@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Bitmap bitmap;//验证码的图
     private String s;//cookie
-    private String name;//账户名
+//    private String name;//账户名
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +48,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         initView();//初始化控件
         SharedPreferences read = getSharedPreferences("rain", MODE_PRIVATE);
-        Boolean a = read.getBoolean("gou", false);
-        if (a) {
-            jizhu.setChecked(a);
-            String user = read.getString("use", "");
-            String pass = read.getString("password", "");
-            zhanghu.setText(user);
-            mima.setText(pass);
+        //----
+        Boolean denglu = read.getBoolean("login",false);
+        if(denglu){
+            Message message = new Message();
+            message.what =2;
+            handler.sendMessage(message);
+        }else {
+            Boolean a = read.getBoolean("gou", false);
+            if (a) {
+                jizhu.setChecked(a);
+                String user = read.getString("use", "");
+                String pass = read.getString("password", "");
+                zhanghu.setText(user);
+                mima.setText(pass);
+            }
+            ChangeImage();
+            yanzhengmatu.setOnClickListener(this);
+            login.setOnClickListener(this);
         }
-        ChangeImage();
-        yanzhengmatu.setOnClickListener(this);
-        login.setOnClickListener(this);
+
     }
 
     /**
@@ -190,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     message.what = 7;
                     handler.sendMessage(message);
                 }else if ("正方教务管理系统".equals(title)) {
+
                     tiqu(data);
                 } else {
                     Message message = new Message();
@@ -224,7 +234,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
              * */
             if (msg.what == 2) {
                 Intent intent = new Intent(MainActivity.this, guodu.class);
-                chucun.xingming = name;
 //                startActivity(intent);
                 startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(MainActivity.this).toBundle());
                 MainActivity.this.finish();
@@ -290,7 +299,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             message.what = 3;
             handler.sendMessage(message);
         }else {
-            name = element.toString();
+            chucun.xingming = element.toString();
+            //登录成功
+            SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
+            editor.putBoolean("login",true);
+            editor.putString("name",element);
+            editor.commit();
             Message message = new Message();
             message.what = 2;
             handler.sendMessage(message);

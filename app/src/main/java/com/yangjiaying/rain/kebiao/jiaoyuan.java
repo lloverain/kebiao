@@ -2,6 +2,7 @@ package com.yangjiaying.rain.kebiao;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
@@ -68,7 +69,18 @@ public class jiaoyuan extends AppCompatActivity {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        getkebiao();
+        SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
+        boolean youdata = read.getBoolean("youdata",false);
+        if(youdata){
+            String shuju = read.getString("data","");
+            Document document = Jsoup.parse(shuju);
+            jiexi(document);
+            Message message = new Message();
+            message.what = 1;
+            handler.sendMessage(message);
+        }else {
+            getkebiao();
+        }
         //获得列头的控件
         empty = (TextView) this.findViewById(R.id.test_empty);
         monColum = (TextView) this.findViewById(R.id.test_monday_course);
@@ -163,35 +175,11 @@ public class jiaoyuan extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String nianji = document.select("select[name=ddlXN]").select("option[selected=selected]").val();
-                String xueqi = document.select("select[name=ddlXQ]").select("option[selected=selected]").val();
-                Elements elementsClass = document.select("td");
-                Elements trs = document.getElementById("Table1").select("tr");
-                for(int i=2,c=0;i<trs.size();i+=2,c++){
-                    Elements tds = trs.get(i).select("td");
-                    //如果tr为2,6,10行就从td的第2开始取  过滤上午，下午，晚上
-                    if(i==2||i==6||i==10){
-                        for(int j=2,x =0 ;j<tds.size();j++,x++){
-                            String a = tds.get(j).html();
-                            a = a.replace("<font color=\"red\">","");
-                            a = a.replace("</font>","");
-                            a = a.replace("&nbsp;","");
-                            a = a.replace("<br>","\n");
-                            data[c][x] = a;
-//                            Log.d(String.valueOf(j),a);
-                        }
-                    }else {
-                        for(int j=1,x =0;j<tds.size();j++,x++){
-                            String a = tds.get(j).html();
-                            a = a.replace("<font color=\"red\">","");
-                            a = a.replace("</font>","");
-                            a = a.replace("&nbsp;","");
-                            a = a.replace("<br>","\n");
-                            data[c][x] = a;
-                        }
-                    }
-
-                }
+                SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
+                editor.putString("data", String.valueOf(document));
+                editor.putBoolean("youdata",true);
+                editor.commit();
+                jiexi(document);
                 Message message = new Message();
                 message.what = 1;
                 handler.sendMessage(message);
@@ -199,6 +187,37 @@ public class jiaoyuan extends AppCompatActivity {
         }).start();
     }
 
+
+    private void jiexi(Document document){
+        String nianji = document.select("select[name=ddlXN]").select("option[selected=selected]").val();
+        String xueqi = document.select("select[name=ddlXQ]").select("option[selected=selected]").val();
+        Elements elementsClass = document.select("td");
+        Elements trs = document.getElementById("Table1").select("tr");
+        for(int i=2,c=0;i<trs.size();i+=2,c++){
+            Elements tds = trs.get(i).select("td");
+            //如果tr为2,6,10行就从td的第2开始取  过滤上午，下午，晚上
+            if(i==2||i==6||i==10){
+                for(int j=2,x =0 ;j<tds.size();j++,x++){
+                    String a = tds.get(j).html();
+                    a = a.replace("<font color=\"red\">","");
+                    a = a.replace("</font>","");
+                    a = a.replace("&nbsp;","");
+                    a = a.replace("<br>","\n");
+                    data[c][x] = a;
+//                            Log.d(String.valueOf(j),a);
+                }
+            }else {
+                for(int j=1,x =0;j<tds.size();j++,x++){
+                    String a = tds.get(j).html();
+                    a = a.replace("<font color=\"red\">","");
+                    a = a.replace("</font>","");
+                    a = a.replace("&nbsp;","");
+                    a = a.replace("<br>","\n");
+                    data[c][x] = a;
+                }
+            }
+        }
+    }
 
     private Handler handler = new Handler(){
         @Override
@@ -208,9 +227,9 @@ public class jiaoyuan extends AppCompatActivity {
                 //data.length = 6        data[i].length=7
                 for(int i=0,t=0;i<data.length;i++,t+=2){
                     for (int j=0,g=1;j<data[i].length;j++,g++){
-                        Log.d("节课", String.valueOf(t));
-                        Log.d("星期", String.valueOf(g));
-                        Log.d("data"+"["+i+"]"+"["+j+"]",data[i][j]);
+//                        Log.d("节课", String.valueOf(t));
+//                        Log.d("星期", String.valueOf(g));
+//                        Log.d("data"+"["+i+"]"+"["+j+"]",data[i][j]);
                         //有课才显示有颜色
                         if(!data[i][j].equals("")){
                             setCourseMessage(g,jieci[i],data[i][j]);
