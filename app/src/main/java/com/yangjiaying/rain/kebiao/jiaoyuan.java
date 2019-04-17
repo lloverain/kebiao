@@ -187,7 +187,10 @@ public class jiaoyuan extends AppCompatActivity {
         }).start();
     }
 
-
+    /**
+     * 解析
+     * @param document
+     */
     private void jiexi(Document document){
         String nianji = document.select("select[name=ddlXN]").select("option[selected=selected]").val();
         String xueqi = document.select("select[name=ddlXQ]").select("option[selected=selected]").val();
