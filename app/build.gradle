@@ -7,7 +7,7 @@ android {
         minSdkVersion 25
         targetSdkVersion 27
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -30,4 +30,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.11.3'
     implementation 'com.allenliu.versionchecklib:library:2.1.9'
     implementation 'com.github.xuexiangjys:XUpdate:1.0.0'
+    implementation files('libs/pgyer_sdk_3.0.4.jar')
+    implementation 'com.jiechic.library:xUtils:2.6.14'
 }

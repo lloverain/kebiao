@@ -1,13 +1,21 @@
 package com.yangjiaying.rain.kebiao;
 
+import android.Manifest;
 import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,9 +27,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.pgyersdk.update.PgyUpdateManager;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import okhttp3.Callback;
@@ -42,10 +60,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String s;//cookie
 //    private String name;//账户名
 
+    String checkurl="http://www.pgyer.com/apiv1/app/viewGroup";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        String codeversin=getVersion();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                check();
+            }
+        }).start();
+
         initView();//初始化控件
         SharedPreferences read = getSharedPreferences("rain", MODE_PRIVATE);
         //----
@@ -81,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         login = findViewById(R.id.login);
         jizhu = findViewById(R.id.jizhu);
     }
-
 
     /**
      * 得到Cookies和验证码图片
@@ -332,6 +359,91 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 显示
         normalDialog.show();
     }
+
+
+    private void installAPK(File savedFile) {
+        //调用系统的安装方法
+        Intent intent=new Intent();
+        intent.setAction(intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.fromFile(savedFile), "application/vnd.android.package-archive");
+        startActivity(intent);
+        finish();
+    }
+
+
+    public void check(){
+        //当所用app前版本号
+        String codeversin=getVersion();
+
+        String s="aId=c564ff760980ab1a81de3b6d53de5233&_api_key=eaab3e20c4bb29a0e6a88a592fda6077";
+        //
+        String sss= Httputils.doPost(checkurl,s);
+        try {
+            JSONObject object=new JSONObject(sss);
+            JSONArray array=object.getJSONArray("data");
+            for(int i=0;i<array.length();i++){
+                JSONObject object1=array.getJSONObject(i);
+                String appVersion=object1.getString("appVersion");
+                Log.d("appVersion",appVersion);
+                Log.d("codeversin",codeversin);
+                double x1=Double.valueOf(appVersion);
+                double x2=Double.valueOf(codeversin);
+                if(x1>x2){
+                    download();
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //
+    }
+
+    public  void download(){
+        String target = Environment.getExternalStorageDirectory()+ "/update.apk";
+        String path="https://www.pgyer.com/apiv2/app/install?appKey=c564ff760980ab1a81de3b6d53de5233&_api_key=eaab3e20c4bb29a0e6a88a592fda6077";
+
+        HttpUtils utils = new HttpUtils();
+        utils.download(path, target, new RequestCallBack<File>() {
+            @Override
+            public void onLoading(long total, long current, boolean isUploading) {
+                super.onLoading(total, current, isUploading);
+            }
+            @Override
+            public void onSuccess(ResponseInfo<File> arg0) {
+                String path=Environment.getExternalStorageDirectory()+ "/update.apk";
+                File file=new File(path);
+                installAPK(file);
+            }
+
+            @Override
+            public void onFailure(HttpException arg0, String arg1) {
+                Log.d("exception", String.valueOf(arg0.getExceptionCode()));
+                Toast.makeText(MainActivity.this, "下载失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+
+    private String getVersion(){
+        PackageInfo pkg;
+        String versionName="";
+        try {
+            pkg = getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
+            String appName = pkg.applicationInfo.loadLabel(getPackageManager()).toString();
+            versionName = pkg.versionName;
+            System.out.println("appName:" + appName);
+            System.out.println("versionName:" + versionName);
+
+        } catch (PackageManager.NameNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return  versionName;
+    }
+
 
     /**
      * 打印超长Log
