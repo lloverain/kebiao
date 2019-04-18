@@ -370,7 +370,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         finish();
     }
 
-
+    /**
+     * 检查是否为最新版本
+     */
     public void check(){
         //当所用app前版本号
         String codeversin=getVersion();
@@ -400,6 +402,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //
     }
 
+    /**
+     * 下载
+     */
     public  void download(){
         String target = Environment.getExternalStorageDirectory()+ "/update.apk";
         String path="https://www.pgyer.com/apiv2/app/install?appKey=c564ff760980ab1a81de3b6d53de5233&_api_key=eaab3e20c4bb29a0e6a88a592fda6077";
@@ -426,7 +431,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
+    /**
+     * 得到版本号和名
+     * @return
+     */
     private String getVersion(){
         PackageInfo pkg;
         String versionName="";
@@ -434,8 +442,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pkg = getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
             String appName = pkg.applicationInfo.loadLabel(getPackageManager()).toString();
             versionName = pkg.versionName;
-            System.out.println("appName:" + appName);
-            System.out.println("versionName:" + versionName);
+            System.out.println("app名:" + appName);
+            System.out.println("得到本地版本号:" + versionName);
 
         } catch (PackageManager.NameNotFoundException e) {
             // TODO Auto-generated catch block
