@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +42,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -65,16 +67,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initView();
         String codeversin=getVersion();
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 check();
             }
         }).start();
-
-        initView();//初始化控件
         SharedPreferences read = getSharedPreferences("rain", MODE_PRIVATE);
         //----
         Boolean denglu = read.getBoolean("login",false);
@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             yanzhengmatu.setOnClickListener(this);
             login.setOnClickListener(this);
         }
-
     }
 
     /**
@@ -108,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         yanzhengma = findViewById(R.id.yanzhengma);
         login = findViewById(R.id.login);
         jizhu = findViewById(R.id.jizhu);
+
     }
 
     /**
@@ -282,6 +282,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if(msg.what == 7){
                 showdialog();
             }
+            if(msg.what == 8){
+                Toast.makeText(MainActivity.this, "请更新最新版", Toast.LENGTH_SHORT).show();
+            }
+            if(msg.what == 9){
+                Toast.makeText(MainActivity.this, "当前版本为最新版", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 
@@ -386,12 +392,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             for(int i=0;i<array.length();i++){
                 JSONObject object1=array.getJSONObject(i);
                 String appVersion=object1.getString("appVersion");
-                Log.d("appVersion",appVersion);
-                Log.d("codeversin",codeversin);
+                Log.d("服务器版本",appVersion);
+                Log.d("本地版本",codeversin);
                 double x1=Double.valueOf(appVersion);
                 double x2=Double.valueOf(codeversin);
                 if(x1>x2){
                     download();
+                }else {
+                    Message message = new Message();
+                    message.what =9;
+                    handler.sendMessage(message);
                 }
             }
 
