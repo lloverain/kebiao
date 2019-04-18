@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
-public class jiaoyuan extends AppCompatActivity {
+public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private  String[][] data  = new String[6][7];
     private DrawerLayout menu;
     private NavigationView daohang;//右边菜单
@@ -69,37 +69,27 @@ public class jiaoyuan extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jiaoyuan);
-        menu = findViewById(R.id.menu);
-        daohang = findViewById(R.id.daohang);
-        daohang.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Log.d("ID", String.valueOf(item.getItemId()));
-                switch (item.getItemId()){
-                    case R.id.gengxin:
-                        Toast.makeText(jiaoyuan.this, "这是更新", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.xuehao:
-                        Toast.makeText(jiaoyuan.this, "这是学号", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.zhanghu:
-                        Toast.makeText(jiaoyuan.this, "这是账户", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.guanyuwomenm:
-                        Toast.makeText(jiaoyuan.this, "关于我们", Toast.LENGTH_SHORT).show();
-                        break;
-                }
-                return true;
-            }
-        });
+        menu = findViewById(R.id.menu);//菜单
+        daohang = findViewById(R.id.daohang);//导航
+        Menu daohangMenu = daohang.getMenu();
+        //读取配置
+        SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
+        String xh = read.getString("use","");
+        String xm = read.getString("name","");
+        boolean youdata = read.getBoolean("youdata",false);
+        xm = xm.replace("同学","");
+        //赋值到菜单里
+        daohangMenu.findItem(R.id.xuehao).setTitle(xh);
+        daohangMenu.findItem(R.id.xingming).setTitle(xm);
+        //单击事件
+        daohang.setNavigationItemSelectedListener(this);
         try {
             byte[] bytes = chucun.xingming.getBytes("utf8");
             chucun.xingming = new String(bytes,"gb2312");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
-        boolean youdata = read.getBoolean("youdata",false);
+        //判断配置里是否有数据
         if(youdata){
             String shuju = read.getString("data","");
             Document document = Jsoup.parse(shuju);
@@ -204,8 +194,7 @@ public class jiaoyuan extends AppCompatActivity {
                             .header("Host", "jw.svtcc.edu.cn")
                             .get();
                 } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                    e.printStackTrace();}
                 SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
                 editor.putString("data", String.valueOf(document));
                 editor.putBoolean("youdata",true);
@@ -342,5 +331,30 @@ public class jiaoyuan extends AppCompatActivity {
         }
         //剩余部分
         Log.i(tag, msg);
+    }
+
+    /**
+     * 菜单每个的单击事件
+     * @param item
+     * @return
+     */
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.gengxin:
+                Toast.makeText(jiaoyuan.this, "这是更新", Toast.LENGTH_SHORT).show();
+                menu.closeDrawers();
+                break;
+            case R.id.xuehao:
+                break;
+            case R.id.xingming:
+                break;
+            case R.id.guanyuwomenm:
+                Toast.makeText(jiaoyuan.this, "关于我们", Toast.LENGTH_SHORT).show();
+                menu.closeDrawers();
+                break;
+        }
+
+        return true;
     }
 }
