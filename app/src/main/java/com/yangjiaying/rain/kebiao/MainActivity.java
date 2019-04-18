@@ -17,6 +17,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -368,10 +369,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void installAPK(File savedFile) {
-        //调用系统的安装方法
-        Intent intent=new Intent();
-        intent.setAction(intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.fromFile(savedFile), "application/vnd.android.package-archive");
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(this,
+                    this.getApplicationContext().getPackageName() + ".provider",
+                    savedFile);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        } else {
+            uri = Uri.fromFile(savedFile);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        }
         startActivity(intent);
         finish();
     }
@@ -416,18 +427,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 下载
      */
     public  void download(){
-        String target = Environment.getExternalStorageDirectory()+ "/update.apk";
+        String target = Environment.getExternalStorageDirectory()+ "/Download/交院课程表.apk";
         String path="https://www.pgyer.com/apiv2/app/install?appKey=c564ff760980ab1a81de3b6d53de5233&_api_key=eaab3e20c4bb29a0e6a88a592fda6077";
 
         HttpUtils utils = new HttpUtils();
         utils.download(path, target, new RequestCallBack<File>() {
+            @Override
+            public void onStart() {
+                super.onStart();
+                Toast.makeText(MainActivity.this, "开始更新", Toast.LENGTH_SHORT).show();
+            }
+
             @Override
             public void onLoading(long total, long current, boolean isUploading) {
                 super.onLoading(total, current, isUploading);
             }
             @Override
             public void onSuccess(ResponseInfo<File> arg0) {
-                String path=Environment.getExternalStorageDirectory()+ "/update.apk";
+                String path=Environment.getExternalStorageDirectory()+ "/Download/交院课程表.apk";
                 File file=new File(path);
                 installAPK(file);
             }
