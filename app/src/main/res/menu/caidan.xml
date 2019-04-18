@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single">
+    <item android:id="@+id/gengxin"
+        android:icon="@mipmap/gengxin"
+        android:title="更新"/>
+    <item android:id="@+id/xuehao"
+        android:icon="@mipmap/xuehao"
+        android:title="学号"/>
+    <item android:id="@+id/xingming"
+        android:icon="@mipmap/xingming"
+        android:title="姓名"/>
+    <item android:id="@+id/guanyuwomenm"
+        android:icon="@mipmap/guanyuwomen"
+        android:title="关于我们"/>
+</group>
+</menu>

@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,10 +18,12 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,6 +36,8 @@ import java.util.Random;
 
 public class jiaoyuan extends AppCompatActivity {
     private  String[][] data  = new String[6][7];
+    private DrawerLayout menu;
+    private NavigationView daohang;//右边菜单
 
     /** 第一个无内容的格子 */
     protected TextView empty;
@@ -62,7 +69,29 @@ public class jiaoyuan extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_jiaoyuan);
-
+        menu = findViewById(R.id.menu);
+        daohang = findViewById(R.id.daohang);
+        daohang.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Log.d("ID", String.valueOf(item.getItemId()));
+                switch (item.getItemId()){
+                    case R.id.gengxin:
+                        Toast.makeText(jiaoyuan.this, "这是更新", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.xuehao:
+                        Toast.makeText(jiaoyuan.this, "这是学号", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.zhanghu:
+                        Toast.makeText(jiaoyuan.this, "这是账户", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.guanyuwomenm:
+                        Toast.makeText(jiaoyuan.this, "关于我们", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                return true;
+            }
+        });
         try {
             byte[] bytes = chucun.xingming.getBytes("utf8");
             chucun.xingming = new String(bytes,"gb2312");
@@ -91,6 +120,8 @@ public class jiaoyuan extends AppCompatActivity {
         satColum  = (TextView) this.findViewById(R.id.test_saturday_course);
         sunColum = (TextView) this.findViewById(R.id.test_sunday_course);
         course_table_layout = (RelativeLayout) this.findViewById(R.id.test_course_rl);
+
+
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         //屏幕宽度

@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Bitmap bitmap;//验证码的图
     private String s;//cookie
-//    private String name;//账户名
 
     String checkurl="http://www.pgyer.com/apiv1/app/viewGroup";
     @Override
@@ -69,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
-        String codeversin=getVersion();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -116,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void ChangeImage() {
         Request request = new Request.Builder()
-                .url("http://jw.svtcc.edu.cn/CheckCode.aspx")
+                .url(chucun.jiaoyuanyanzhengmatuURL)
                 .build();
         OkHttpClient okHttpClient = new OkHttpClient();
         okhttp3.Call call = okHttpClient.newCall(request);
@@ -160,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder()
                 .header("Cookie", cookie)
-                .header("Referer", "http://jw.svtcc.edu.cn/")
+                .header("Referer", chucun.jiaoyuanguanwangURL)
                 .url("http://jw.svtcc.edu.cn/default2.aspx")
                 .build();
         Response response = okHttpClient.newCall(request).execute();
@@ -169,9 +167,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return viewstate;
     }
 
-    /*
+    /**
      * 登录
-     * */
+     * @param zhanghu
+     * @param mima
+     * @param yanzhengma
+     */
     private void LoginServer(String zhanghu, String mima, String yanzhengma) {
         chucun.xuehao = zhanghu;
         OkHttpClient okHttpClient = new OkHttpClient();
@@ -201,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final Request request = new Request.Builder()
                 .addHeader("cookie", s)
-                .url("http://jw.svtcc.edu.cn/default2.aspx")
+                .url(chucun.jiaoyuanzhuyeURL)
                 .post(body)
                 .build();
         okhttp3.Call call2 = okHttpClient.newCall(request);
@@ -227,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     message.what = 7;
                     handler.sendMessage(message);
                 }else if ("正方教务管理系统".equals(title)) {
-
                     tiqu(data);
                 } else {
                     Message message = new Message();
@@ -246,6 +246,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 5    提示验证码获取失败
      * 6    提示服务器未响应，请稍后再试
      * 7    验证码输入错误时，提示并重新刷新验证码
+     * 8    提示更新到最新版
+     * 9    提示已经是最新版了
      */
     private Handler handler = new Handler() {
         @Override
@@ -367,7 +369,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         normalDialog.show();
     }
 
-
+    /**
+     * 自动安装app
+     * @param savedFile
+     */
     private void installAPK(File savedFile) {
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
@@ -424,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 下载
+     * 下载app
      */
     public  void download(){
         String target = Environment.getExternalStorageDirectory()+ "/Download/交院课程表.apk";
