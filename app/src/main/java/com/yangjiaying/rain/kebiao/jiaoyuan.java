@@ -1,6 +1,8 @@
 package com.yangjiaying.rain.kebiao;
 
 import android.app.Dialog;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,7 +41,9 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
     private  String[][] data  = new String[6][7];
     private DrawerLayout menu;
     private NavigationView daohang;//右边菜单
-
+    private TextView xibie;
+    private TextView zhuanye;
+    private TextView xingzhengban;
     /** 第一个无内容的格子 */
     protected TextView empty;
     /** 星期一的格子 */
@@ -72,6 +76,9 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
         setContentView(R.layout.activity_jiaoyuan);
         menu = findViewById(R.id.menu);//菜单
         daohang = findViewById(R.id.daohang);//导航
+        xibie = findViewById(R.id.xibie);
+        zhuanye = findViewById(R.id.zhuanye);
+        xingzhengban = findViewById(R.id.xingzhengban);
         Menu daohangMenu = daohang.getMenu();
         //读取配置
         SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
@@ -213,8 +220,14 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
      * @param document
      */
     private void jiexi(Document document){
-        String nianji = document.select("select[name=ddlXN]").select("option[selected=selected]").val();
-        String xueqi = document.select("select[name=ddlXQ]").select("option[selected=selected]").val();
+        String xibie = document.getElementById("Label7").html();
+        String zhuanye = document.getElementById("Label8").html();
+        String xingzhengban = document.getElementById("Label9").html();
+        SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
+        editor.putString("xibie",xibie);
+        editor.putString("zhuanye",zhuanye);
+        editor.putString("xingzhengban",xingzhengban);
+        editor.commit();
         Elements elementsClass = document.select("td");
         Elements trs = document.getElementById("Table1").select("tr");
         for(int i=2,c=0;i<trs.size();i+=2,c++){
@@ -249,6 +262,13 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
             super.handleMessage(msg);
             if(msg.what==1){
                 //data.length = 6        data[i].length=7
+                SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
+                String xb = read.getString("xibie","");//系别
+                String zy = read.getString("zhuanye","");//专业
+                String xzb = read.getString("xingzhengban","");//行政班
+                xibie.setText(xb);
+                zhuanye.setText(zy);
+                xingzhengban.setText(xzb);
                 for(int i=0,t=0;i<data.length;i++,t+=2){
                     for (int j=0,g=1;j<data[i].length;j++,g++){
 //                        Log.d("节课", String.valueOf(t));
@@ -354,8 +374,20 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
                 menu.closeDrawers();
                 break;
             case R.id.xuehao:
+                SharedPreferences read = getSharedPreferences("rain",MODE_PRIVATE);
+                String xh = read.getString("use","");
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                // 将文本内容放到系统剪贴板里。
+                cm.setText(xh);
+                Toast.makeText(this, "复制成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.xingming:
+                SharedPreferences reads = getSharedPreferences("rain",MODE_PRIVATE);
+                String xm = reads.getString("name","");
+                xm = xm.replace("同学","");
+                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                clipboardManager.setText(xm);
+                Toast.makeText(this, "复制成功", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.guanyuwomenm:
                 Toast.makeText(jiaoyuan.this, "关于我们", Toast.LENGTH_SHORT).show();
