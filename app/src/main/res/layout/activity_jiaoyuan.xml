@@ -17,9 +17,8 @@
             />
 
         <TextView android:id="@+id/test_monday_course"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="星期一"
             android:layout_toRightOf="@id/test_empty"
             />
