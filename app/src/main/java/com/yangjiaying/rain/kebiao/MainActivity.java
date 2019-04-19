@@ -2,6 +2,7 @@ package com.yangjiaying.rain.kebiao;
 
 import android.Manifest;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +10,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         new Thread(new Runnable() {
             @Override
             public void run() {
-                check();
+                check();//检查是否为最新版
             }
         }).start();
         SharedPreferences read = getSharedPreferences("rain", MODE_PRIVATE);
@@ -174,69 +177,104 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param yanzhengma
      */
     private void LoginServer(String zhanghu, String mima, String yanzhengma) {
-        chucun.xuehao = zhanghu;
-        OkHttpClient okHttpClient = new OkHttpClient();
-        FormBody body = new FormBody.Builder()
-                .add("__VIEWSTATE", chucun.__VIEWSTATE)
-                .add("TextBox1", zhanghu)
-                .add("TextBox2", mima)
-                .add("TextBox3", yanzhengma)
-                .add("RadioButtonList1", "%D1%A7%C9%FA")
-                .add("Button1", "")
-                .build();
+        if(isNetworkAvailable(MainActivity.this)){
+            chucun.xuehao = zhanghu;
+            OkHttpClient okHttpClient = new OkHttpClient();
+            FormBody body = new FormBody.Builder()
+                    .add("__VIEWSTATE", chucun.__VIEWSTATE)
+                    .add("TextBox1", zhanghu)
+                    .add("TextBox2", mima)
+                    .add("TextBox3", yanzhengma)
+                    .add("RadioButtonList1", "%D1%A7%C9%FA")
+                    .add("Button1", "")
+                    .build();
 
-        if (jizhu.isChecked()) {
-            SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
-            editor.putString("use", zhanghu);
-            editor.putString("password", mima);
-            editor.putBoolean("gou", true);
-            editor.commit();
-        } else {
-            SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
-            editor.putString("use", zhanghu);
-            editor.putString("password", "");
-            editor.putBoolean("gou", false);
-            editor.commit();
-        }
-
-
-        final Request request = new Request.Builder()
-                .addHeader("cookie", s)
-                .url(chucun.jiaoyuanzhuyeURL)
-                .post(body)
-                .build();
-        okhttp3.Call call2 = okHttpClient.newCall(request);
-        call2.enqueue(new Callback() {
-            @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
-                e.printStackTrace();
-                Message message = new Message();
-                message.what = 6;
-                handler.sendMessage(message);
+            if (jizhu.isChecked()) {
+                SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
+                editor.putString("use", zhanghu);
+                editor.putString("password", mima);
+                editor.putBoolean("gou", true);
+                editor.commit();
+            } else {
+                SharedPreferences.Editor editor = getSharedPreferences("rain", MODE_PRIVATE).edit();
+                editor.putString("use", zhanghu);
+                editor.putString("password", "");
+                editor.putBoolean("gou", false);
+                editor.commit();
             }
 
-            @Override
-            public void onResponse(okhttp3.Call call, Response response) throws IOException {
-                /*你想要执行的下一步功能*/
-                byte[] bytes = response.body().bytes();
-                String data = new String(bytes, "gb2312");
-                Document document = Jsoup.parse(data);
-                String title = document.title();
-//                Log.d("data", data);//登录之后得到的html
-                if("登录".equals(title)){
+
+            final Request request = new Request.Builder()
+                    .addHeader("cookie", s)
+                    .url(chucun.jiaoyuanzhuyeURL)
+                    .post(body)
+                    .build();
+            okhttp3.Call call2 = okHttpClient.newCall(request);
+            call2.enqueue(new Callback() {
+                @Override
+                public void onFailure(okhttp3.Call call, IOException e) {
+                    e.printStackTrace();
                     Message message = new Message();
-                    message.what = 7;
-                    handler.sendMessage(message);
-                }else if ("正方教务管理系统".equals(title)) {
-                    tiqu(data);
-                } else {
-                    Message message = new Message();
-                    message.what = 4;
+                    message.what = 6;
                     handler.sendMessage(message);
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(okhttp3.Call call, Response response) throws IOException {
+                    /*你想要执行的下一步功能*/
+                    byte[] bytes = response.body().bytes();
+                    String data = new String(bytes, "gb2312");
+                    Document document = Jsoup.parse(data);
+                    String title = document.title();
+                    Log.d("data", data);//登录之后得到的html
+                    if("登录".equals(title)){
+                        Message message = new Message();
+                        message.what = 7;
+                        handler.sendMessage(message);
+                    }else if("ERROR - 出错啦！".equals(title)){
+                        Message message = new Message();
+                        message.what = 4;
+                        handler.sendMessage(message);
+                    }
+                    else if ("正方教务管理系统".equals(title)) {
+                        tiqu(data);
+                    } else {
+                        Message message = new Message();
+                        message.what = 4;
+                        handler.sendMessage(message);
+                    }
+                }
+            });
+        }else {
+            Toast.makeText(this, "没有网络!", Toast.LENGTH_SHORT).show();
+        }
+        
     }
+
+    /**
+     * 判断是否有网
+     * @param context
+     * @return
+     */
+    public static boolean isNetworkAvailable(Context context) {
+
+        ConnectivityManager manager = (ConnectivityManager) context
+                .getApplicationContext().getSystemService(
+                        Context.CONNECTIVITY_SERVICE);
+
+        if (manager == null) {
+            return false;
+        }
+
+        NetworkInfo networkinfo = manager.getActiveNetworkInfo();
+
+        if (networkinfo == null || !networkinfo.isAvailable()) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     /**
      * 1    给验证码控件附图片

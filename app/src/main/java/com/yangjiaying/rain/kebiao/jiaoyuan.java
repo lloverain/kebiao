@@ -2,6 +2,7 @@ package com.yangjiaying.rain.kebiao;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Handler;
@@ -269,6 +270,12 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
         return true;
     }
 
+    /**
+     * 设置课表布局
+     * @param xingqi 星期
+     * @param jieci 节课
+     * @param courseMessage 课表内容
+     */
     public void setCourseMessage(int xingqi, int jieci, final String courseMessage){
         //五种颜色的背景
         int[] background = {R.drawable.red, R.drawable.green,
@@ -342,7 +349,8 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case R.id.gengxin:
-                Toast.makeText(jiaoyuan.this, "这是更新", Toast.LENGTH_SHORT).show();
+                getkebiao();
+                Toast.makeText(this, "更新成功", Toast.LENGTH_SHORT).show();
                 menu.closeDrawers();
                 break;
             case R.id.xuehao:
@@ -353,8 +361,17 @@ public class jiaoyuan extends AppCompatActivity implements NavigationView.OnNavi
                 Toast.makeText(jiaoyuan.this, "关于我们", Toast.LENGTH_SHORT).show();
                 menu.closeDrawers();
                 break;
+            case R.id.zhuxiao:
+                SharedPreferences.Editor editor = getSharedPreferences("rain",MODE_PRIVATE).edit();
+                editor.putBoolean("login",false);
+                editor.putBoolean("youdata",false);
+                editor.putString("data","");
+                editor.commit();
+                Intent intent = new Intent(jiaoyuan.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+                break;
         }
-
         return true;
     }
 }

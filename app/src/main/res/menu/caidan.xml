@@ -11,9 +11,12 @@
         android:title="学号"/>
     <item android:id="@+id/gengxin"
         android:icon="@mipmap/gengxin"
-        android:title="更新"/>
+        android:title="更新课表"/>
     <item android:id="@+id/guanyuwomenm"
         android:icon="@mipmap/guanyuwomen"
         android:title="关于我们"/>
+    <item android:id="@+id/zhuxiao"
+        android:icon="@mipmap/zhuxiao"
+        android:title="注销"/>
 </group>
 </menu>
