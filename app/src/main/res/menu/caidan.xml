@@ -14,7 +14,7 @@
         android:title="更新课表"/>
     <item android:id="@+id/guanyuwomenm"
         android:icon="@mipmap/guanyuwomen"
-        android:title="关于我们"/>
+        android:title="作者:颖"/>
     <item android:id="@+id/zhuxiao"
         android:icon="@mipmap/zhuxiao"
         android:title="注销"/>

@@ -26,7 +26,7 @@ public class guodu extends AppCompatActivity {
         String xingming = read.getString("name","");
         chucun.xingming = xingming;
         name.setText("欢迎你!\n"+xingming);
-        Integer time = 3000;    //设置等待时间，单位为毫秒
+        Integer time = 2500;    //设置等待时间，单位为毫秒
         Handler handler = new Handler();
         //当计时结束时，跳转至主界面
         handler.postDelayed(new Runnable() {

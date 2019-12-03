@@ -4,12 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#f2a0a0"
+    android:background="#E2E2E2"
     android:gravity="center"
     tools:context=".MainActivity">
     <ImageView
         android:layout_width="80dp"
         android:layout_height="80dp"
+        android:layout_marginBottom="50dp"
         android:background="@mipmap/xiaohui"/>
     <TextView
         android:layout_width="match_parent"
@@ -27,25 +28,29 @@
         <EditText
             android:id="@+id/zhanghu"
             android:layout_width="match_parent"
-            android:hint="账户"
+            android:hint="输入学号"
             android:lines="1"
             android:singleLine="true"
             android:background="@drawable/wenkenkuang"
+            android:gravity="center"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_height="50dp" />
         <EditText
             android:id="@+id/mima"
             android:layout_width="match_parent"
-            android:hint="密码"
+            android:hint="输入密码(默认身份证后6位)"
             android:singleLine="true"
             android:lines="1"
+            android:gravity="center"
             android:background="@drawable/wenkenkuang"
             android:password="true"
+            android:layout_marginBottom="20dp"
             android:layout_height="50dp" />
        <LinearLayout
            android:layout_width="match_parent"
            android:layout_height="40dp"
+           android:layout_marginBottom="20dp"
            android:layout_marginTop="10dp"
            android:orientation="horizontal">
            <EditText
@@ -53,7 +58,9 @@
                android:layout_width="0dp"
                android:layout_weight="1"
                android:hint="验证码"
+               android:paddingLeft="20dp"
                android:lines="1"
+               android:gravity="center"
                android:singleLine="true"
                android:background="@drawable/wenkenkuang"
                android:layout_height="match_parent" />
@@ -61,6 +68,7 @@
                android:id="@+id/yanzhengmatu"
                android:layout_width="0dp"
                android:layout_weight="1"
+               android:src="@mipmap/error"
                android:layout_height="match_parent" />
 
        </LinearLayout>

@@ -3,13 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/jiaoyuanfenguang"
     tools:context=".guodu">
 <TextView
     android:id="@+id/name"
     android:layout_width="match_parent"
     android:text="欢迎你，某某同学"
-    android:textColor="#000000"
+    android:textColor="#ffffff"
     android:textSize="25sp"
     android:gravity="center"
+    android:paddingBottom="450dp"
     android:layout_height="match_parent" />
 </android.support.constraint.ConstraintLayout>
